@@ -15,7 +15,6 @@ namespace ApplicationManagerForms
         public ApplicationManager()
         {
             InitializeComponent();
-            CenterToScreen();
         }
 
         private void Btn_Installer_Click(object sender, EventArgs e)

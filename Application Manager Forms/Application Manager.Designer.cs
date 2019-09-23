@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             System.Windows.Forms.Label Lbl_Title;
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ApplicationManager));
             this.Pnl_Close = new System.Windows.Forms.Panel();
             this.Btn_Close = new System.Windows.Forms.Button();
             this.Pnl_Uninstaller = new System.Windows.Forms.Panel();
@@ -40,6 +41,17 @@
             this.Pnl_Uninstaller.SuspendLayout();
             this.Pnl_Installer.SuspendLayout();
             this.SuspendLayout();
+            // 
+            // Lbl_Title
+            // 
+            Lbl_Title.Dock = System.Windows.Forms.DockStyle.Fill;
+            Lbl_Title.Font = new System.Drawing.Font("Monotxt_IV25", 13.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            Lbl_Title.Location = new System.Drawing.Point(50, 35);
+            Lbl_Title.Name = "Lbl_Title";
+            Lbl_Title.Size = new System.Drawing.Size(532, 58);
+            Lbl_Title.TabIndex = 12;
+            Lbl_Title.Text = "Application Manager";
+            Lbl_Title.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // Pnl_Close
             // 
@@ -104,17 +116,6 @@
             this.Btn_Installer.UseVisualStyleBackColor = true;
             this.Btn_Installer.Click += new System.EventHandler(this.Btn_Installer_Click);
             // 
-            // Lbl_Title
-            // 
-            Lbl_Title.Dock = System.Windows.Forms.DockStyle.Fill;
-            Lbl_Title.Font = new System.Drawing.Font("Monotxt_IV25", 13.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            Lbl_Title.Location = new System.Drawing.Point(50, 35);
-            Lbl_Title.Name = "Lbl_Title";
-            Lbl_Title.Size = new System.Drawing.Size(532, 58);
-            Lbl_Title.TabIndex = 12;
-            Lbl_Title.Text = "Application Manager";
-            Lbl_Title.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
             // ApplicationManager
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -124,8 +125,10 @@
             this.Controls.Add(this.Pnl_Installer);
             this.Controls.Add(this.Pnl_Uninstaller);
             this.Controls.Add(this.Pnl_Close);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "ApplicationManager";
             this.Padding = new System.Windows.Forms.Padding(50, 35, 50, 50);
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Application Manager";
             this.Pnl_Close.ResumeLayout(false);
             this.Pnl_Uninstaller.ResumeLayout(false);

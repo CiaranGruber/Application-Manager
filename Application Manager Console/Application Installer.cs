@@ -172,7 +172,7 @@ namespace ApplicationManagerConsole
             while (menuOption != 4)
             {
                 ConsoleUtils.PrepNewScreen("Application Installer");
-                ConsoleUtils.CreateMenu(new string[] { "Display Settings", "Change Settings", "Install with current settings", "Close" });
+                ConsoleUtils.CreateMenu(new string[] { "Display Settings", "Change Settings", "Install with current settings", "Back" });
                 menuOption = ConsoleUtils.FancyGetInteger("Menu Option: ", "Option must be an integer", "Default", 1, 4, maxCharLength: 1, maxCharHeight: 1);
                 
                 switch (menuOption)

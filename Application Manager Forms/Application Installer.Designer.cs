@@ -34,6 +34,7 @@
             System.Windows.Forms.FlowLayoutPanel Flp_Options;
             System.Windows.Forms.Label Lbl_ProgramLocation;
             System.Windows.Forms.Label Lbl_InstallLocation;
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ApplicationInstaller));
             this.Btn_Back = new System.Windows.Forms.Button();
             this.Btn_Install = new System.Windows.Forms.Button();
             this.ChBox_HasFolder = new System.Windows.Forms.CheckBox();
@@ -349,8 +350,10 @@
             this.Controls.Add(this.Pnl_ExecutableName);
             this.Controls.Add(Pnl_Buttons);
             this.Controls.Add(Lbl_Title);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "ApplicationInstaller";
             this.Padding = new System.Windows.Forms.Padding(50);
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Application Installer";
             this.Load += new System.EventHandler(this.ApplicationInstaller_Load);
             Pnl_Buttons.ResumeLayout(false);

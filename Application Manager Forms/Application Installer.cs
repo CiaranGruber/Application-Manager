@@ -19,7 +19,6 @@ namespace ApplicationManagerForms
         public ApplicationInstaller()
         {
             InitializeComponent();
-            CenterToParent();
         }
 
         private void ApplicationInstaller_Load(object sender, EventArgs e)
@@ -123,7 +122,7 @@ namespace ApplicationManagerForms
         {
             FolderBrowserDialog fileExplorer = new FolderBrowserDialog();
             fileExplorer.Description = "Choose folder containing the of the program";
-            fileExplorer.SelectedPath = Path.Combine(Txt_ProgramLocation.Text, Txt_ExecutableName.Text);
+            fileExplorer.SelectedPath = Txt_ProgramLocation.Text;
             if (fileExplorer.ShowDialog() == DialogResult.OK)
             {
                 Txt_ProgramLocation.Text = fileExplorer.SelectedPath;
@@ -134,7 +133,7 @@ namespace ApplicationManagerForms
         {
             FolderBrowserDialog fileExplorer = new FolderBrowserDialog();
             fileExplorer.Description = "Choose Location to Install To";
-            fileExplorer.SelectedPath = Path.Combine(Txt_ProgramLocation.Text, Txt_ExecutableName.Text);
+            fileExplorer.SelectedPath = Txt_InstallLocation.Text;
             if (fileExplorer.ShowDialog() == DialogResult.OK)
             {
                 Txt_InstallLocation.Text = fileExplorer.SelectedPath;

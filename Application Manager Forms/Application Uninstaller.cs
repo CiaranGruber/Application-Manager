@@ -17,7 +17,6 @@ namespace ApplicationManagerForms
         public ApplicationUninstaller()
         {
             InitializeComponent();
-            CenterToParent();
         }
 
         private void ApplicationUninstaller_Load(object sender, EventArgs e)
@@ -52,6 +51,28 @@ namespace ApplicationManagerForms
         private void Btn_Back_Click(object sender, EventArgs e)
         {
             Close();
+        }
+
+        private void Btn_SaveLocationBrowse_Click(object sender, EventArgs e)
+        {
+            FolderBrowserDialog fileExplorer = new FolderBrowserDialog();
+            fileExplorer.Description = "Choose Location to Install To";
+            fileExplorer.SelectedPath = Txt_SaveLocation.Text;
+            if (fileExplorer.ShowDialog() == DialogResult.OK)
+            {
+                Txt_SaveLocation.Text = fileExplorer.SelectedPath;
+            }
+        }
+
+        private void Btn_InstallLocationBrowse_Click(object sender, EventArgs e)
+        {
+            FolderBrowserDialog fileExplorer = new FolderBrowserDialog();
+            fileExplorer.Description = "Choose Location to Install To";
+            fileExplorer.SelectedPath = Txt_InstallLocation.Text;
+            if (fileExplorer.ShowDialog() == DialogResult.OK)
+            {
+                Txt_InstallLocation.Text = fileExplorer.SelectedPath;
+            }
         }
     }
 }
