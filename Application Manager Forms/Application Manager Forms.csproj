@@ -7,7 +7,7 @@
     <ProjectGuid>{12650496-6F11-4A61-82BF-D6923B144696}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Application_Manager_Forms</RootNamespace>
+    <RootNamespace>ApplicationManagerForms</RootNamespace>
     <AssemblyName>Application Manager Forms</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -46,14 +46,35 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Form1.cs">
+    <Compile Include="Application Installer.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Form1.Designer.cs">
-      <DependentUpon>Form1.cs</DependentUpon>
+    <Compile Include="Application Installer.designer.cs">
+      <DependentUpon>Application Installer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Application Manager.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Application Manager.designer.cs">
+      <DependentUpon>Application Manager.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Application Uninstaller.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Application Uninstaller.designer.cs">
+      <DependentUpon>Application Uninstaller.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="Application Installer.resx">
+      <DependentUpon>Application Installer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Application Manager.resx">
+      <DependentUpon>Application Manager.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Application Uninstaller.resx">
+      <DependentUpon>Application Uninstaller.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -62,6 +83,7 @@
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
     </Compile>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
