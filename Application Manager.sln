@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Application Manager Forms",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "App Manager Code", "App Manager Code\App Manager Code.csproj", "{3A7CE8EF-C211-47CC-BBAD-55751065BF9F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Application Manager Console", "Application Manager Console\Application Manager Console.csproj", "{E82DD51A-3652-4731-82A3-8F75E028B4CF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{3A7CE8EF-C211-47CC-BBAD-55751065BF9F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3A7CE8EF-C211-47CC-BBAD-55751065BF9F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3A7CE8EF-C211-47CC-BBAD-55751065BF9F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E82DD51A-3652-4731-82A3-8F75E028B4CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E82DD51A-3652-4731-82A3-8F75E028B4CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E82DD51A-3652-4731-82A3-8F75E028B4CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E82DD51A-3652-4731-82A3-8F75E028B4CF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
