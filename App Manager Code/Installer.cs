@@ -70,12 +70,14 @@ namespace AppInstallerCode
                         Environment.SpecialFolder.Desktop), shortcutName)) as IWshShortcut;
                 }
             }
+            shortcut.WorkingDirectory = installFolder;
             shortcut.TargetPath = Path.Combine(installFolder, Path.Combine(installFolder, executablePath));
             shortcut.Save();
 
             // Desktop shortcuts will be created if they are expected
             if (createDesktopShortcut)
             {
+                desktopShortcut.WorkingDirectory = installFolder;
                 desktopShortcut.TargetPath = Path.Combine(installFolder, Path.Combine(installFolder, executablePath));
                 desktopShortcut.Save();
             }
