@@ -34,11 +34,13 @@ namespace ApplicationManagerForms
             else if (!ChBox_SaveData.Checked)
             {
                 Uninstaller.UninstallApp(Txt_ShortcutName.Text, Txt_InstallLocation.Text);
+                MessageBox.Show("Application successfully uninstalled");
             }
             else if (Directory.Exists(Txt_SaveLocation.Text) || (!Directory.Exists(Txt_SaveLocation.Text) && 
                 MessageBox.Show("Save Folder does not exist so installer will need to create one. Continue?", "Uninstall", MessageBoxButtons.YesNo) == DialogResult.Yes))
             {
                 Uninstaller.MoveApp(Txt_ShortcutName.Text, Txt_InstallLocation.Text, Txt_SaveLocation.Text);
+                MessageBox.Show("Application successfully saved to save location");
             }
         }
 
@@ -56,7 +58,7 @@ namespace ApplicationManagerForms
         private void Btn_SaveLocationBrowse_Click(object sender, EventArgs e)
         {
             FolderBrowserDialog fileExplorer = new FolderBrowserDialog();
-            fileExplorer.Description = "Choose Location to Install To";
+            fileExplorer.Description = "Choose location to save To";
             fileExplorer.SelectedPath = Txt_SaveLocation.Text;
             if (fileExplorer.ShowDialog() == DialogResult.OK)
             {
@@ -67,7 +69,7 @@ namespace ApplicationManagerForms
         private void Btn_InstallLocationBrowse_Click(object sender, EventArgs e)
         {
             FolderBrowserDialog fileExplorer = new FolderBrowserDialog();
-            fileExplorer.Description = "Choose Location to Install To";
+            fileExplorer.Description = "Choose location of installation";
             fileExplorer.SelectedPath = Txt_InstallLocation.Text;
             if (fileExplorer.ShowDialog() == DialogResult.OK)
             {
