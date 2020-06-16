@@ -1,23 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.IO;
+﻿using AppInstallerCode;
+using System;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.IO;
 using System.Windows.Forms;
-using AppInstallerCode;
+using System.Drawing;
+using FormUtilities;
 
 namespace ApplicationManagerForms
 {
     public partial class ApplicationInstaller : Form
     {
         private bool InstallLocationModified;
+        private List<ExecutableData> Executables;
 
         public ApplicationInstaller()
         {
+            Executables = new List<ExecutableData>();
             InitializeComponent();
         }
 
@@ -35,7 +34,6 @@ namespace ApplicationManagerForms
 
         private void ChBox_HasFolder_CheckedChanged(object sender, EventArgs e)
         {
-            Lbl_ExecutableName.Text = ChBox_HasFolder.Checked ? "Executable Path (from program location)" : "Executable Name";
             ChangeInstallText();
         }
 
@@ -70,23 +68,55 @@ namespace ApplicationManagerForms
                 {
                     Txt_InstallLocation.Text = Path.Combine(Txt_InstallLocation.Text, Path.GetFileName(Txt_ProgramLocation.Text));
                 }
-                else
+                else if (Executables.Count > 0)
                 {
-                    Txt_InstallLocation.Text = Path.Combine(Txt_InstallLocation.Text, Path.GetFileNameWithoutExtension(Txt_ExecutableName.Text));
+                    Txt_InstallLocation.Text = Path.Combine(Txt_InstallLocation.Text, Executables[0].ShortcutName);
                 }
-                InstallLocationModified = false;
             }
+        }
+
+        private bool ApplicationExists()
+        {
+            foreach (ExecutableData executableData in Executables)
+            {
+                if (File.Exists(Path.Combine(Txt_InstallLocation.Text, executableData.ExecutablePath)))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private bool AllExecutablesExist()
+        {
+            foreach (ExecutableData executableData in Executables)
+            {
+                if (!File.Exists(Path.Combine(Txt_ProgramLocation.Text, executableData.ExecutablePath)))
+                {
+                    return false;
+                }
+            }
+            return true;
         }
 
         private void Btn_Install_Click(object sender, EventArgs e)
         {
-            if (File.Exists(Path.Combine(Txt_InstallLocation.Text, Txt_ExecutableName.Text)))
+            if (ApplicationExists())
             {
                 MessageBox.Show("Application already exists at selected location");
             }
-            else if (!File.Exists(Path.Combine(Txt_ProgramLocation.Text, Txt_ExecutableName.Text)))
+            else if (!AllExecutablesExist())
             {
-                MessageBox.Show("Executable located at \"" + Path.Combine(Txt_ProgramLocation.Text, Txt_ExecutableName.Text) + "\" does not exist");
+                string nonExistentExecString = "";
+                foreach (ExecutableData executableData in Executables)
+                {
+                    if (!File.Exists(Path.Combine(Txt_ProgramLocation.Text, executableData.ExecutablePath)))
+                    {
+                        nonExistentExecString += "\"" + executableData.ExecutablePath + "\", ";
+                    }
+                }
+                nonExistentExecString = nonExistentExecString.Substring(0, nonExistentExecString.Length - 2);
+                MessageBox.Show("Executables located at the locations (relative to Program Location)" + nonExistentExecString + " does not exist");
             }
             else if (!Directory.Exists(Txt_ProgramLocation.Text))
             {
@@ -96,7 +126,7 @@ namespace ApplicationManagerForms
             else if (Directory.Exists(Txt_InstallLocation.Text) || (!Directory.Exists(Txt_InstallLocation.Text) &&
                     MessageBox.Show("Install Folder does not exist so installer will need to create one. Continue?", "Unknown Folder", MessageBoxButtons.YesNo) == DialogResult.Yes))
             {
-                Installer.InstallApp(Txt_ExecutableName.Text, Txt_ShortcutName.Text, Txt_ProgramLocation.Text, Txt_InstallLocation.Text, ChBox_HasFolder.Checked, ChBox_CreateDesktopShortcut.Checked, ChBox_InstallAdmin.Checked);
+                Installer.InstallApp(Executables, Txt_ProgramLocation.Text, Txt_InstallLocation.Text, ChBox_HasFolder.Checked, ChBox_InstallAdmin.Checked);
                 MessageBox.Show("Application successfully installed");
             }
         }
@@ -106,23 +136,13 @@ namespace ApplicationManagerForms
             Close();
         }
 
-        private void Btn_ExecutableNameBrowse_Click(object sender, EventArgs e)
-        {
-            OpenFileDialog fileExplorer = new OpenFileDialog();
-            fileExplorer.Title = "Choose Executable";
-            fileExplorer.Multiselect = false;
-            fileExplorer.InitialDirectory = Path.Combine(Txt_ProgramLocation.Text, Txt_ExecutableName.Text);
-            if (fileExplorer.ShowDialog() == DialogResult.OK)
-            {
-                Txt_ExecutableName.Text = fileExplorer.SafeFileName;
-            }
-        }
-
         private void Btn_ProgramLocationBrowse_Click(object sender, EventArgs e)
         {
-            FolderBrowserDialog fileExplorer = new FolderBrowserDialog();
-            fileExplorer.Description = "Choose folder containing the of the program";
-            fileExplorer.SelectedPath = Txt_ProgramLocation.Text;
+            FolderBrowserDialog fileExplorer = new FolderBrowserDialog
+            {
+                Description = "Choose folder containing the of the program",
+                SelectedPath = Txt_ProgramLocation.Text
+            };
             if (fileExplorer.ShowDialog() == DialogResult.OK)
             {
                 Txt_ProgramLocation.Text = fileExplorer.SelectedPath;
@@ -131,12 +151,90 @@ namespace ApplicationManagerForms
 
         private void Btn_InstallLocationBrowse_Click(object sender, EventArgs e)
         {
-            FolderBrowserDialog fileExplorer = new FolderBrowserDialog();
-            fileExplorer.Description = "Choose Location to Install To";
-            fileExplorer.SelectedPath = Txt_InstallLocation.Text;
+            FolderBrowserDialog fileExplorer = new FolderBrowserDialog
+            {
+                Description = "Choose Location to Install To",
+                SelectedPath = Txt_InstallLocation.Text
+            };
             if (fileExplorer.ShowDialog() == DialogResult.OK)
             {
                 Txt_InstallLocation.Text = fileExplorer.SelectedPath;
+            }
+        }
+
+        private void Btn_AddExecutable_Click(object sender, EventArgs e)
+        {
+            ChooseExecutables executableChooser = new ChooseExecutables(Txt_ProgramLocation.Text, Executables);
+            if (executableChooser.ShowDialog() == DialogResult.Yes)
+            {
+                ExecutableData executable = executableChooser.NewExecutable;
+                Executables.Add(executable);
+
+                Panel newPanel = new Panel
+                {
+                    Dock = DockStyle.Top,
+                    Height = 25
+                };
+                Label shortcutLabel = new Label
+                {
+                    Text = executable.ShortcutName,
+                    TextAlign = ContentAlignment.MiddleLeft,
+                    Dock = DockStyle.Left,
+                    Width = 175,
+                    AutoEllipsis = true
+                };
+                Label pathLabel = new Label
+                {
+                    Text = executable.ExecutablePath,
+                    TextAlign = ContentAlignment.MiddleLeft,
+                    Dock = DockStyle.Fill,
+                    AutoEllipsis = true
+                };
+                CheckBox onDesktop = new CheckBox
+                {
+                    Enabled = false,
+                    Checked = executable.OnDesktop,
+                    Dock = DockStyle.Right,
+                    Width = 75
+                };
+                Button changeButton = new Button
+                {
+                    Text = "Change",
+                    Name = Pnl_Executables.Controls.Count.ToString(),
+                    Dock = DockStyle.Right,
+                    Width = 100
+                };
+                changeButton.Click += ChangeButton_Click;
+
+                newPanel.Controls.Add(pathLabel);
+                newPanel.Controls.Add(shortcutLabel);
+                newPanel.Controls.Add(onDesktop);
+                newPanel.Controls.Add(changeButton);
+
+                Pnl_Executables.Controls.Insert(0, newPanel);
+            }
+            ChangeInstallText();
+        }
+
+        private void ChangeButton_Click(object sender, EventArgs e)
+        {
+            Button changeButton = (Button)sender;
+            int index = Convert.ToInt32(changeButton.Name);
+            int panelIndex = Pnl_Executables.Controls.Count - index - 1;
+            ChooseExecutables executableChooser = new ChooseExecutables(Txt_ProgramLocation.Text, Executables, Executables[index]);
+            executableChooser.ShowDialog();
+            if (executableChooser.DialogResult == DialogResult.Yes)
+            {
+                ExecutableData executable = executableChooser.NewExecutable;
+                Executables[index] = executable;
+                Pnl_Executables.Controls[panelIndex].Controls[1].Text = executable.ShortcutName;
+                Pnl_Executables.Controls[panelIndex].Controls[0].Text = executable.ExecutablePath;
+                ((CheckBox) Pnl_Executables.Controls[panelIndex].Controls[2]).Checked = executable.OnDesktop;
+            }
+            else if (executableChooser.DialogResult == DialogResult.No)
+            {
+                Executables.RemoveAt(index);
+                Pnl_Executables.Controls.RemoveAt(panelIndex);
             }
         }
     }

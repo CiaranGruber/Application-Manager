@@ -53,6 +53,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AddShortcut.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AddShortcut.Designer.cs">
+      <DependentUpon>AddShortcut.cs</DependentUpon>
+    </Compile>
     <Compile Include="Application Installer.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -71,8 +77,18 @@
     <Compile Include="Application Uninstaller.designer.cs">
       <DependentUpon>Application Uninstaller.cs</DependentUpon>
     </Compile>
+    <Compile Include="ChooseExecutables.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ChooseExecutables.Designer.cs">
+      <DependentUpon>ChooseExecutables.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GeneralControlUtils.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="AddShortcut.resx">
+      <DependentUpon>AddShortcut.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Application Installer.resx">
       <DependentUpon>Application Installer.cs</DependentUpon>
     </EmbeddedResource>
@@ -81,6 +97,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Application Uninstaller.resx">
       <DependentUpon>Application Uninstaller.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ChooseExecutables.resx">
+      <DependentUpon>ChooseExecutables.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

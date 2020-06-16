@@ -17,17 +17,15 @@ namespace AppInstallerCode
         /// <summary>
         /// Installs an app using the full process
         /// </summary>
-        /// <param name="executablePath">The path of the executable from the program folder</param>
-        /// <param name="shortcutName">The name of the shortcuts to be created</param>
+        /// <param name="executables">The list of executables installed in the program</param>
         /// <param name="programFolder">The folder where the program is situated</param>
         /// <param name="installFolder">The folder where the program is to be installed</param>
         /// <param name="containedInAnAppFolder">Whether the executable is contained in an app folder or is standalone</param>
-        /// <param name="createDesktopShortcut">Whether to create desktop shortcuts or not</param>
         /// <param name="isAdmin">Whether the user wishes to act as admin or not</param>
-        public static void InstallApp(string executablePath, string shortcutName, string programFolder, string installFolder, bool containedInAnAppFolder, bool createDesktopShortcut, bool isAdmin)
+        public static void InstallApp(List<ExecutableData> executables, string programFolder, string installFolder, bool containedInAnAppFolder, bool isAdmin)
         {
             // Change shortcut name to include standard .lnk extension
-            shortcutName = Path.GetFileNameWithoutExtension(shortcutName) + ".lnk";
+            executables.ForEach(x => x.ShortcutName = Path.GetFileNameWithoutExtension(x.ShortcutName) + ".lnk");
 
             // Move files to project folder
             Directory.CreateDirectory(installFolder);
@@ -37,49 +35,54 @@ namespace AppInstallerCode
             }
             else
             {
-                System.IO.File.Move(Path.Combine(programFolder, executablePath), Path.Combine(installFolder, executablePath));
+                foreach (ExecutableData executable in executables)
+                {
+                    System.IO.File.Move(Path.Combine(programFolder, executable.ExecutablePath), Path.Combine(installFolder, executable.ExecutablePath));
+                }
             }
 
             // Create shortcuts
             IWshShell_Class wsh = new IWshShell_Class();
-            IWshShortcut shortcut;
-            IWshShortcut desktopShortcut = null;
-            if (isAdmin)
+            foreach (ExecutableData executable in executables)
             {
-                // Create standard shortcut
-                shortcut = wsh.CreateShortcut(Path.Combine(Environment.GetFolderPath(
-                    Environment.SpecialFolder.CommonPrograms), shortcutName)) as IWshShortcut;
-
-                // Create desktop shortcut
-                if (createDesktopShortcut)
+                IWshShortcut shortcut, desktopShortcut = null;
+                if (isAdmin)
                 {
-                    desktopShortcut = wsh.CreateShortcut(Path.Combine(Environment.GetFolderPath(
-                        Environment.SpecialFolder.CommonDesktopDirectory), shortcutName)) as IWshShortcut;
-                }
-            }
-            else
-            {
-                // Create standard shortcuts
-                shortcut = wsh.CreateShortcut(Path.Combine(Environment.GetFolderPath(
-                    Environment.SpecialFolder.Programs), shortcutName)) as IWshShortcut;
+                    // Create standard shortcut
+                    shortcut = wsh.CreateShortcut(Path.Combine(Environment.GetFolderPath(
+                        Environment.SpecialFolder.CommonPrograms), executable.ShortcutName)) as IWshShortcut;
 
-                // Create desktop shortcut
-                if (createDesktopShortcut)
+                    // Create desktop shortcut
+                    if (executable.OnDesktop)
+                    {
+                        desktopShortcut = wsh.CreateShortcut(Path.Combine(Environment.GetFolderPath(
+                            Environment.SpecialFolder.CommonDesktopDirectory), executable.ShortcutName)) as IWshShortcut;
+                    }
+                }
+                else
                 {
-                    desktopShortcut = wsh.CreateShortcut(Path.Combine(Environment.GetFolderPath(
-                        Environment.SpecialFolder.Desktop), shortcutName)) as IWshShortcut;
-                }
-            }
-            shortcut.WorkingDirectory = installFolder;
-            shortcut.TargetPath = Path.Combine(installFolder, Path.Combine(installFolder, executablePath));
-            shortcut.Save();
+                    // Create standard shortcuts
+                    shortcut = wsh.CreateShortcut(Path.Combine(Environment.GetFolderPath(
+                        Environment.SpecialFolder.Programs), executable.ShortcutName)) as IWshShortcut;
 
-            // Desktop shortcuts will be created if they are expected
-            if (createDesktopShortcut)
-            {
-                desktopShortcut.WorkingDirectory = installFolder;
-                desktopShortcut.TargetPath = Path.Combine(installFolder, Path.Combine(installFolder, executablePath));
-                desktopShortcut.Save();
+                    // Create desktop shortcut
+                    if (executable.OnDesktop)
+                    {
+                        desktopShortcut = wsh.CreateShortcut(Path.Combine(Environment.GetFolderPath(
+                            Environment.SpecialFolder.Desktop), executable.ShortcutName)) as IWshShortcut;
+                    }
+                }
+                shortcut.WorkingDirectory = installFolder;
+                shortcut.TargetPath = Path.Combine(installFolder, Path.Combine(installFolder, executable.ExecutablePath));
+                shortcut.Save();
+
+                // Desktop shortcuts will be created if they are required
+                if (executable.OnDesktop)
+                {
+                    desktopShortcut.WorkingDirectory = installFolder;
+                    desktopShortcut.TargetPath = Path.Combine(installFolder, Path.Combine(installFolder, executable.ExecutablePath));
+                    desktopShortcut.Save();
+                }
             }
         }
     }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO.IsolatedStorage;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -438,27 +439,32 @@ namespace ApplicationManagerConsole
         {
             // Sets variables
             int availableWidth;
+            int availableHeight = settings.MaximumHeight;
             int spacesToAdd;
+            int lineCount = 1;
             int word = 0;
             int widestLine = 0;
             bool cursorShownOriginally = Console.CursorVisible;
+            int terminalWidth = Console.WindowWidth;
+            string currentLine;
+            string nextWord;
+            string rawText = Convert.ToString(text);
+            List<string> printingList = new List<string>();
             Console.CursorVisible = settings.ShowCursor;
 
             // Checks and sets cursor positioning
             Location returnPosition = new Location(0, 0);
             int[] startingCursorPosition = new int[] { Console.CursorLeft, Console.CursorTop };
 
+            if (settings.Location.X + settings.InnerPadding.Left >= Console.BufferWidth || 
+                settings.Location.Y + settings.InnerPadding.Top >= Console.BufferHeight)
+            {
+                return settings.Location;
+            }
             Console.SetCursorPosition(settings.Location.X, settings.Location.Y);
 
             Location cursorPosition = new Location(Console.CursorLeft, Console.CursorTop);
 
-            int terminalWidth = Console.WindowWidth;
-            string currentLine;
-            string nextWord = "";
-            string rawText = Convert.ToString(text);
-            List<char> alignedList = new List<char>();
-            List<string> printingList = new List<string>();
-            List<string> alignmentTypes = new List<string> { "left", "right", "centre", "justified" };
 
             // Checks if text is null
             if (rawText == null)
@@ -504,8 +510,9 @@ namespace ApplicationManagerConsole
             // Gets the list to print
             string[] rawTextWords = rawText.Split(' ');
             nextWord = rawTextWords[word];
-            while (word < rawTextWords.Length || nextWord != "")
+            while ((word < rawTextWords.Length || nextWord != "") && lineCount <= availableHeight)
             {
+                lineCount++;
                 currentLine = "";
 
                 // If word is bigger than the available width
@@ -911,6 +918,12 @@ namespace ApplicationManagerConsole
         {
             int currentLine = Console.CursorTop;
             int currentDigit = Console.CursorLeft;
+
+            // Prevent memory overflow by maximising PadLeft size
+            if (finishingLocation.X > Console.WindowWidth)
+            {
+                finishingLocation.X = Console.WindowWidth;
+            }
 
             // Clears line between limits if there is anything to clear
             Console.CursorVisible = false;
@@ -1329,9 +1342,16 @@ namespace ApplicationManagerConsole
             Location promptFinalPos = new Location(0, 0);
             FormattedWriteSettings changedWriteOptions;
 
+            // If inputs are not case-sensitive, make inputs all lowered
             if (!isCaseSensitive)
             {
                 allowedInputs = allowedInputs.Select(x => x.ToLower());
+            }
+
+            // Fix char length if it is less than 0
+            if (maxCharLength < 0)
+            {
+                maxCharLength = 0;
             }
 
             // Get prompt settings and set more error prompt settings
@@ -1376,15 +1396,30 @@ namespace ApplicationManagerConsole
                     input = GetLimitedSizeInput(maxCharLength, maxCharHeight);
                 }
 
-                // Check if input is acceptable
-                if (allowedInputs.Contains(input.ToLower()))
+                // Determine if input is valid
+                if (isCaseSensitive)
                 {
-                    invalidInput = false;
+                    invalidInput = !allowedInputs.Contains(input);
                 }
                 else
                 {
+                    invalidInput = !allowedInputs.Contains(input.ToLower());
+                }
+
+                // Check if input is acceptable
+                if (invalidInput)
+                {
                     // Clear the input
-                    ClearArea(inputCursorPos, new Location(inputCursorPos.X + maxCharLength, Console.CursorTop));
+                    Location secondLocation = new Location(0, Console.CursorTop);
+                    if (inputCursorPos.X + maxCharLength < inputCursorPos.X)
+                    {
+                        secondLocation.X = int.MaxValue;
+                    }
+                    else
+                    {
+                        secondLocation.X = inputCursorPos.X + maxCharLength;
+                    }
+                    ClearArea(inputCursorPos, secondLocation);
 
                     // Clear the space taken by the previous error
                     if (hadError)
@@ -1430,9 +1465,16 @@ namespace ApplicationManagerConsole
             Location promptFinalPos = new Location(0, 0);
             FormattedWriteSettings changedWriteOptions;
 
+            // If inputs are not case-sensitive, make inputs all lowered
             if (!isCaseSensitive)
             {
                 unacceptableInputs = unacceptableInputs.Select(x => x.ToLower());
+            }
+
+            // Fix char length if it is less than 0
+            if (maxCharLength < 0)
+            {
+                maxCharLength = 0;
             }
 
             // Get prompt settings and set more error prompt settings
@@ -1471,10 +1513,28 @@ namespace ApplicationManagerConsole
                 input = GetLimitedSizeInput(maxCharLength, maxCharHeight);
 
                 // Check if input is acceptable
-                if (unacceptableInputs.Contains(input.ToLower()))
+                if (isCaseSensitive)
+                {
+                    invalidInput = unacceptableInputs.Contains(input);
+                }
+                else
+                {
+                    invalidInput = unacceptableInputs.Contains(input.ToLower());
+                }
+
+                // Apply changes if invalid
+                if (invalidInput)
                 {
                     // Clear the input
-                    ClearArea(inputCursorPos, new Location(inputCursorPos.X + maxCharLength, Console.CursorTop));
+                    Location secondLocation = new Location(0, Console.CursorTop);
+                    if (inputCursorPos.X + maxCharLength < inputCursorPos.X)
+                    {
+                        secondLocation.X = int.MaxValue;
+                    } else
+                    {
+                        secondLocation.X = inputCursorPos.X + maxCharLength;
+                    }
+                    ClearArea(inputCursorPos, secondLocation);
 
                     // Clear the space taken by the previous error
                     if (hadError)
@@ -1485,10 +1545,6 @@ namespace ApplicationManagerConsole
                     // Write the error
                     finalCursorPosition = FormattedWrite(errorPrompt, changedWriteOptions);
                     hadError = true;
-                }
-                else
-                {
-                    invalidInput = false;
                 }
             }
 

@@ -45,7 +45,7 @@
             // Lbl_Title
             // 
             Lbl_Title.Dock = System.Windows.Forms.DockStyle.Fill;
-            Lbl_Title.Font = new System.Drawing.Font("Monotxt_IV25", 13.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            Lbl_Title.Font = new System.Drawing.Font("Courier New", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             Lbl_Title.Location = new System.Drawing.Point(50, 35);
             Lbl_Title.Name = "Lbl_Title";
             Lbl_Title.Size = new System.Drawing.Size(532, 58);

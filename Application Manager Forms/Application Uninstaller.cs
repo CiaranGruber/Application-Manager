@@ -1,22 +1,21 @@
 ﻿using AppInstallerCode;
+using FormUtilities;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace ApplicationManagerForms
 {
     public partial class ApplicationUninstaller : Form
     {
+        private List<string> Shortcuts;
+
         public ApplicationUninstaller()
         {
             InitializeComponent();
+            Shortcuts = new List<string>();
         }
 
         private void ApplicationUninstaller_Load(object sender, EventArgs e)
@@ -33,13 +32,13 @@ namespace ApplicationManagerForms
             }
             else if (!ChBox_SaveData.Checked)
             {
-                Uninstaller.UninstallApp(Txt_ShortcutName.Text, Txt_InstallLocation.Text);
+                Uninstaller.UninstallApp(Shortcuts, Txt_InstallLocation.Text);
                 MessageBox.Show("Application successfully uninstalled");
             }
-            else if (Directory.Exists(Txt_SaveLocation.Text) || (!Directory.Exists(Txt_SaveLocation.Text) && 
+            else if (Directory.Exists(Txt_SaveLocation.Text) || (!Directory.Exists(Txt_SaveLocation.Text) &&
                 MessageBox.Show("Save Folder does not exist so installer will need to create one. Continue?", "Uninstall", MessageBoxButtons.YesNo) == DialogResult.Yes))
             {
-                Uninstaller.MoveApp(Txt_ShortcutName.Text, Txt_InstallLocation.Text, Txt_SaveLocation.Text);
+                Uninstaller.MoveApp(Shortcuts, Txt_InstallLocation.Text, Txt_SaveLocation.Text);
                 MessageBox.Show("Application successfully saved to save location");
             }
         }
@@ -57,9 +56,11 @@ namespace ApplicationManagerForms
 
         private void Btn_SaveLocationBrowse_Click(object sender, EventArgs e)
         {
-            FolderBrowserDialog fileExplorer = new FolderBrowserDialog();
-            fileExplorer.Description = "Choose location to save To";
-            fileExplorer.SelectedPath = Txt_SaveLocation.Text;
+            FolderBrowserDialog fileExplorer = new FolderBrowserDialog
+            {
+                Description = "Choose location to save To",
+                SelectedPath = Txt_SaveLocation.Text
+            };
             if (fileExplorer.ShowDialog() == DialogResult.OK)
             {
                 Txt_SaveLocation.Text = fileExplorer.SelectedPath;
@@ -68,13 +69,61 @@ namespace ApplicationManagerForms
 
         private void Btn_InstallLocationBrowse_Click(object sender, EventArgs e)
         {
-            FolderBrowserDialog fileExplorer = new FolderBrowserDialog();
-            fileExplorer.Description = "Choose location of installation";
-            fileExplorer.SelectedPath = Txt_InstallLocation.Text;
+            FolderBrowserDialog fileExplorer = new FolderBrowserDialog
+            {
+                Description = "Choose location of installation",
+                SelectedPath = Txt_InstallLocation.Text
+            };
             if (fileExplorer.ShowDialog() == DialogResult.OK)
             {
                 Txt_InstallLocation.Text = fileExplorer.SelectedPath;
             }
+        }
+
+        private void Btn_AddShortcut_Click(object sender, EventArgs e)
+        {
+            AddShortcut shortcutAdder = new AddShortcut(Shortcuts);
+            shortcutAdder.ShowDialog();
+            if (shortcutAdder.DialogResult == DialogResult.OK)
+            {
+                Shortcuts.Add(shortcutAdder.ShortcutName);
+
+                Panel shortcutPanel = new Panel
+                {
+                    Dock = DockStyle.Top,
+                    Height = 25
+                };
+                Label shortcutLabel = new Label
+                {
+                    Text = shortcutAdder.ShortcutName,
+                    TextAlign = ContentAlignment.MiddleLeft,
+                    Dock = DockStyle.Fill,
+                    AutoEllipsis = true
+                };
+                Button removeButton = new Button
+                {
+                    Text = "Remove",
+                    Name = Pnl_Executables.Controls.Count.ToString(),
+                    Dock = DockStyle.Right,
+                    Width = 100
+                };
+
+                removeButton.Click += RemoveButton_Click;
+
+                shortcutPanel.Controls.Add(shortcutLabel);
+                shortcutPanel.Controls.Add(removeButton);
+
+                Pnl_Executables.Controls.Insert(0, shortcutPanel);
+            }
+        }
+
+        private void RemoveButton_Click(object sender, EventArgs e)
+        {
+            Button changeButton = (Button)sender;
+            int index = Convert.ToInt32(changeButton.Name);
+            int panelIndex = Pnl_Executables.Controls.Count - index - 1;
+            Shortcuts.RemoveAt(index);
+            Pnl_Executables.Controls.RemoveAt(panelIndex);
         }
     }
 }

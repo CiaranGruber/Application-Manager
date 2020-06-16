@@ -15,28 +15,38 @@ namespace AppInstallerCode
         /// <summary>
         /// Uninstalls an app and removes all data
         /// </summary>
-        /// <param name="shortcutName">The name of the shortcuts to be removed</param>
+        /// <param name="shortcuts">The shortcuts that are to be removed</param>
         /// <param name="installationLocation">The location of the installation</param>
-        public static void UninstallApp(string shortcutName, string installationLocation)
+        public static void UninstallApp(List<string> shortcuts, string installationLocation)
         {
             // Use move app method to reduce errors - delete created directory
-            MoveApp(shortcutName, installationLocation, Path.Combine(Path.GetTempPath(), "Directory Deletion"));
+            MoveApp(shortcuts, installationLocation, Path.Combine(Path.GetTempPath(), "Directory Deletion"));
             Directory.Delete(Path.Combine(Path.GetTempPath(), "Directory Deletion"));
         }
 
         /// <summary>
         /// Uninstalls shortcuts and moves program data to a specified location
         /// </summary>
-        /// <param name="shortcutName">The name of the shortcuts to be removed</param>
+        /// <param name="shortcuts">The name of the shortcuts to be removed</param>
         /// <param name="installationLocation">The location of the installation</param>
         /// <param name="saveLocation">The save location to save to - if null, program will be uninstalled completely</param>
-        public static void MoveApp(string shortcutName, string installationLocation, string saveLocation)
+        public static void MoveApp(List<string> shortcuts, string installationLocation, string saveLocation)
         {
-            if (Path.GetExtension(shortcutName) != ".lnk")
+            string[] shortcut_directories = { Environment.GetFolderPath(Environment.SpecialFolder.CommonDesktopDirectory),
+                Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
+                Environment.GetFolderPath(Environment.SpecialFolder.CommonPrograms),
+                Environment.GetFolderPath(Environment.SpecialFolder.Programs),
+            };
+
+            for (int i = 0; i < shortcuts.Count; ++i) 
             {
-                shortcutName += ".lnk";
+                if (Path.GetExtension(shortcuts[i]) != ".lnk")
+                {
+                    shortcuts[i] += ".lnk";
+                }
             }
 
+            // Create save directory
             Directory.CreateDirectory(saveLocation);
 
             // Move file
@@ -49,21 +59,16 @@ namespace AppInstallerCode
                 File.Move(installationLocation, saveLocation);
             }
 
-            if (File.Exists(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonDesktopDirectory), shortcutName)))
+            // Remove all existing shortcuts 
+            foreach (string shortcut in shortcuts)
             {
-                File.Delete(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonDesktopDirectory), shortcutName));
-            }
-            if (File.Exists(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), shortcutName)))
-            {
-                File.Delete(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), shortcutName));
-            }
-            if (File.Exists(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonPrograms), shortcutName)))
-            {
-                File.Delete(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonPrograms), shortcutName));
-            }
-            if (File.Exists(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Programs), shortcutName)))
-            {
-                File.Delete(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Programs), shortcutName));
+                foreach (string directory in shortcut_directories)
+                {
+                    if (File.Exists(Path.Combine(directory, shortcut)))
+                    {
+                        File.Delete(Path.Combine(directory, shortcut));
+                    }
+                }
             }
         }
     }

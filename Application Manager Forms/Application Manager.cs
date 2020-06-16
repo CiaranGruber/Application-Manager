@@ -1,11 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace ApplicationManagerForms
@@ -22,6 +15,7 @@ namespace ApplicationManagerForms
             Hide();
             Form Installer = new ApplicationInstaller();
             Installer.ShowDialog();
+            CenterToScreen();
             Show();
         }
 
@@ -30,6 +24,7 @@ namespace ApplicationManagerForms
             Hide();
             Form Uninstaller = new ApplicationUninstaller();
             Uninstaller.ShowDialog();
+            CenterToScreen();
             Show();
         }
 
